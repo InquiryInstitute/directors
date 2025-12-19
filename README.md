@@ -175,7 +175,16 @@ Access the board chat at `/board.html`. Features:
   - **Decision Hierarchy**: Institute → College → College Views → Personal Platform
 - **On/Off the Record Toggle**: Toggle button to mark messages as off the record (not formally recorded)
 - **Issue Tracking**: Create and track issues for board discussion
-- **Voting System**: Directors can vote on issues (Yes/No/Abstain)
+- **Enhanced Voting System**: 
+  - Directors can vote on issues (Yes/No/Abstain)
+  - Vote weighting for special circumstances
+  - Vote notes and detailed rationale
+  - Comprehensive vote summaries with weighted totals
+- **Action Items Tracking**: 
+  - Create action items linked to issues
+  - Assign to directors or members
+  - Set due dates and track status (open, in_progress, completed, cancelled)
+  - Overdue indicators and status management
 - **Member Classes**: Different access levels (custodian, member, observer)
 
 ### Off the Record Feature
