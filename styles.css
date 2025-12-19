@@ -101,6 +101,54 @@ main {
   overflow: hidden;
 }
 
+.director-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.director-portrait {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.director-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.portrait-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+}
+
+.portrait-initials {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.director-info {
+  flex: 1;
+  min-width: 0;
+}
+
 .board-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
@@ -129,21 +177,21 @@ main {
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.5px;
-  margin-bottom: 1rem;
-}
-
-.college-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--primary-color);
   margin-bottom: 0.5rem;
 }
 
+.college-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+}
+
 .director-name {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--text-color);
-  margin: 1rem 0;
+  margin: 0;
   line-height: 1.3;
 }
 
@@ -224,5 +272,20 @@ footer p {
 
   .board-card {
     padding: 1.5rem;
+  }
+
+  .director-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .director-portrait {
+    width: 120px;
+    height: 120px;
+  }
+
+  .portrait-initials {
+    font-size: 2.5rem;
   }
 }

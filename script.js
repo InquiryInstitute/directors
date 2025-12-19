@@ -88,11 +88,30 @@ function createDirectorCard(director, college) {
 
   const interests = director.rationale || college?.description || 'No interests specified';
   const platform = director.platform_statement || null;
+  const portraitUrl = director.portrait_url || null;
 
   card.innerHTML = `
-    <div class="college-code">${college?.code || 'N/A'}</div>
-    <div class="college-name">${college?.name || 'Unknown College'}</div>
-    <div class="director-name">${director.director_name || 'Vacant'}</div>
+    <div class="director-header">
+      ${portraitUrl ? `
+        <div class="director-portrait">
+          <img src="${escapeHtml(portraitUrl)}" alt="${escapeHtml(director.director_name || 'Director')}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="portrait-placeholder" style="display: none;">
+            <span class="portrait-initials">${getInitials(director.director_name || 'Director')}</span>
+          </div>
+        </div>
+      ` : `
+        <div class="director-portrait">
+          <div class="portrait-placeholder">
+            <span class="portrait-initials">${getInitials(director.director_name || 'Director')}</span>
+          </div>
+        </div>
+      `}
+      <div class="director-info">
+        <div class="college-code">${college?.code || 'N/A'}</div>
+        <div class="college-name">${college?.name || 'Unknown College'}</div>
+        <div class="director-name">${director.director_name || 'Vacant'}</div>
+      </div>
+    </div>
     
     <div class="director-section">
       <div class="section-label">Interests</div>
@@ -116,11 +135,30 @@ function createHereticCard(heretic) {
 
   const interests = heretic.rationale || 'No interests specified';
   const platform = heretic.platform_statement || null;
+  const portraitUrl = heretic.portrait_url || null;
 
   card.innerHTML = `
-    <div class="college-code">HERETIC</div>
-    <div class="college-name">Heretic Position</div>
-    <div class="director-name">${heretic.director_name || 'Vacant'}</div>
+    <div class="director-header">
+      ${portraitUrl ? `
+        <div class="director-portrait">
+          <img src="${escapeHtml(portraitUrl)}" alt="${escapeHtml(heretic.director_name || 'Heretic')}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="portrait-placeholder" style="display: none;">
+            <span class="portrait-initials">${getInitials(heretic.director_name || 'Heretic')}</span>
+          </div>
+        </div>
+      ` : `
+        <div class="director-portrait">
+          <div class="portrait-placeholder">
+            <span class="portrait-initials">${getInitials(heretic.director_name || 'Heretic')}</span>
+          </div>
+        </div>
+      `}
+      <div class="director-info">
+        <div class="college-code">HERETIC</div>
+        <div class="college-name">Heretic Position</div>
+        <div class="director-name">${heretic.director_name || 'Vacant'}</div>
+      </div>
+    </div>
     
     <div class="director-section">
       <div class="section-label">Interests</div>
@@ -136,6 +174,16 @@ function createHereticCard(heretic) {
   `;
 
   return card;
+}
+
+// Utility: Get initials from name
+function getInitials(name) {
+  if (!name || name === 'Vacant') return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
 }
 
 // Utility: Escape HTML
