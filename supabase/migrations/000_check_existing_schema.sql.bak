@@ -1,0 +1,33 @@
+-- Check and adapt to existing schema
+-- This migration handles cases where tables already exist with different types
+
+-- Check if colleges table exists and what type id is
+DO $$
+DECLARE
+  id_type TEXT;
+BEGIN
+  -- Get the data type of the id column
+  SELECT data_type INTO id_type
+  FROM information_schema.columns
+  WHERE table_name = 'colleges' AND column_name = 'id';
+  
+  -- If colleges exists with TEXT id, we need to handle it
+  IF id_type = 'text' THEN
+    -- Alter the table to use UUID if it's TEXT
+    ALTER TABLE colleges ALTER COLUMN id TYPE UUID USING id::uuid;
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Table doesn't exist or other error, continue with normal creation
+    NULL;
+END $$;
+
+-- Ensure colleges table exists with correct schema
+CREATE TABLE IF NOT EXISTS colleges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code VARCHAR(10) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);

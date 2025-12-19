@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+config.local.js
+config.prod.js
+.DS_Store
+*.log
+supabase/.temp/
+supabase/.branches/

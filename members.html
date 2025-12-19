@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Management - Inquiry Institute</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="board.css">
+  <meta name="description" content="Member management for the Inquiry Institute Board of Directors.">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Inquiry Institute</h1>
+      <h2>Member Management</h2>
+      <div class="auth-status" id="auth-status">
+        <span id="user-email"></span>
+        <button id="logout-btn" class="btn-secondary" style="display: none;">Logout</button>
+        <button id="login-btn" class="btn-primary">Login</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container board-main">
+    <!-- Login Form -->
+    <div id="login-container" class="login-container" style="display: none;">
+      <div class="login-card">
+        <h2>Member Access</h2>
+        <p>Please authenticate to access member management.</p>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <div id="login-error" class="error-message" style="display: none;"></div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <p style="font-size: 0.9rem; color: #666;">Don't have an account?</p>
+          <button id="show-signup" class="btn-secondary" style="margin-top: 0.5rem;">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signup-container" class="login-container" style="display: none;">
+      <div class="login-card">
+        <h2>Sign Up</h2>
+        <p>Create an account to participate in board proceedings.</p>
+        <form id="signup-form">
+          <div class="form-group">
+            <label for="signup-name">Name</label>
+            <input type="text" id="signup-name" name="name" required placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" name="email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" name="password" required minlength="6">
+            <small style="color: #666; font-size: 0.85rem;">Minimum 6 characters</small>
+          </div>
+          <button type="submit" class="btn-primary">Sign Up</button>
+        </form>
+        <div id="signup-error" class="error-message" style="display: none;"></div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+          <p style="font-size: 0.9rem; color: #666;">Already have an account?</p>
+          <button id="show-login" class="btn-secondary" style="margin-top: 0.5rem;">Login</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Member Management Interface (Custodian Only) -->
+    <div id="member-interface" class="board-interface" style="display: none;">
+      <div class="section-header">
+        <h3>Member Management</h3>
+        <button id="add-member-btn" class="btn-primary btn-small">+ Add Member</button>
+      </div>
+
+      <div id="access-denied" class="error-message" style="display: none;">
+        <p><strong>Access Denied</strong></p>
+        <p>Only the custodian can access member management.</p>
+        <p><a href="board.html">Go to Board Chat</a></p>
+      </div>
+
+      <div id="members-list" class="members-list">
+        <div class="loading">Loading members...</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Member Modal -->
+  <div id="add-member-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Member</h3>
+        <button class="modal-close" id="close-add-member-modal">&times;</button>
+      </div>
+      <form id="add-member-form">
+        <div class="form-group">
+          <label for="member-email">Email</label>
+          <input type="email" id="member-email" name="email" required placeholder="member@example.com">
+        </div>
+        <div class="form-group">
+          <label for="member-name">Name</label>
+          <input type="text" id="member-name" name="name" required placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label for="member-class">Member Class</label>
+          <select id="member-class" name="member_class" required>
+            <option value="member">Member</option>
+            <option value="observer">Observer</option>
+            <option value="custodian">Custodian</option>
+          </select>
+          <small style="color: #666; font-size: 0.85rem;">
+            Members can participate in chat and voting. Observers have read-only access.
+          </small>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancel-add-member">Cancel</button>
+          <button type="submit" class="btn-primary">Add Member</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Inquiry Institute. All rights reserved.</p>
+      <p>
+        <a href="index.html" style="color: white; opacity: 0.9;">Board of Directors</a> |
+        <a href="board.html" style="color: white; opacity: 0.9;">Board Chat</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script type="module" src="members.js"></script>
+</body>
+</html>

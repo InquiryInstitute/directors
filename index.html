@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board of Directors - Inquiry Institute</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Board of Directors for the Inquiry Institute, representing directors from each college.">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Inquiry Institute</h1>
+      <h2>Board of Directors</h2>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="loading" class="loading">
+      <p>Loading board members...</p>
+    </div>
+
+    <div id="error" class="error" style="display: none;">
+      <p>Error loading board members. Please check your Supabase configuration.</p>
+    </div>
+
+    <div id="board-container" class="board-container" style="display: none;">
+      <div class="board-grid" id="board-grid">
+        <!-- Board members will be inserted here -->
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Inquiry Institute. All rights reserved.</p>
+      <p><a href="board.html" style="color: white; opacity: 0.9;">Board Proceedings & Voting</a></p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
