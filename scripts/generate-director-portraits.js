@@ -17,8 +17,20 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env from current directory
 dotenv.config();
+
+// Also try loading from ../dcio/.env if it exists
+const dcioEnvPath = path.join(__dirname, '../../dcio/.env');
+if (fs.existsSync(dcioEnvPath)) {
+  dotenv.config({ path: dcioEnvPath, override: false });
+  console.log('📁 Loaded credentials from ../dcio/.env');
+}
 
 const DIRECTORS = [
   { name: 'Alan Turing', college: 'AINS', prompt: 'Alan Turing, carved marble bust, classical sculpture, detailed facial features, mathematician and computer scientist' },
@@ -39,21 +51,46 @@ async function generatePortrait(replicate, prompt, directorName) {
   
   try {
     // Using a sculpture/bust generation model
-    // You may need to adjust the model based on what's available
-    const output = await replicate.run(
+    // Try different models that work well for sculptures/busts
+    const models = [
+      "black-forest-labs/flux-pro",  // High quality image generation
       "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
-      {
-        input: {
-          prompt: `${prompt}, professional sculpture, museum quality, high detail, carved bust`,
-          negative_prompt: "photograph, photo, modern, color, painting",
-          num_outputs: 1,
-          guidance_scale: 7.5,
-          num_inference_steps: 50,
-        }
-      }
-    );
+      "lucataco/flux-pro",  // Alternative flux model
+    ];
     
-    return output[0];
+    let lastError = null;
+    for (const model of models) {
+      try {
+        console.log(`   Trying model: ${model}`);
+        const output = await replicate.run(
+          model,
+          {
+            input: {
+              prompt: `${prompt}, professional sculpture, museum quality, high detail, carved marble bust, classical statue, white marble, detailed facial features, ancient Greek or Roman style`,
+              negative_prompt: "photograph, photo, modern, color, painting, drawing, sketch, 2d",
+              num_outputs: 1,
+              ...(model.includes('flux') ? {
+                num_inference_steps: 28,
+                guidance_scale: 3.5,
+              } : {
+                guidance_scale: 7.5,
+                num_inference_steps: 50,
+              }),
+            }
+          }
+        );
+        
+        const imageUrl = Array.isArray(output) ? output[0] : output;
+        console.log(`   ✅ Generated successfully`);
+        return imageUrl;
+      } catch (error) {
+        console.log(`   ⚠️  Model ${model} failed: ${error.message}`);
+        lastError = error;
+        continue;
+      }
+    }
+    
+    throw lastError || new Error('All models failed');
   } catch (error) {
     console.error(`Error generating portrait for ${directorName}:`, error);
     throw error;
@@ -115,8 +152,17 @@ async function updateSupabase(supabase, directorName, portraitUrl) {
 async function main() {
   // Initialize clients
   if (!process.env.REPLICATE_API_TOKEN) {
+    console.error('❌ REPLICATE_API_TOKEN not found');
+    console.error('   Checked:');
+    console.error(`   - .env in current directory`);
+    console.error(`   - ${dcioEnvPath}`);
+    console.error('');
+    console.error('   Get your token from: https://replicate.com/account/api-tokens');
+    console.error('   Or set: export REPLICATE_API_TOKEN=your-token');
     throw new Error('REPLICATE_API_TOKEN environment variable is required');
   }
+  
+  console.log(`✅ Found Replicate API token: ${process.env.REPLICATE_API_TOKEN.substring(0, 10)}...`);
   
   const replicate = new Replicate({
     auth: process.env.REPLICATE_API_TOKEN,
