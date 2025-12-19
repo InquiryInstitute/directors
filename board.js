@@ -264,6 +264,14 @@ function setupSubscriptions() {
       { event: '*', schema: 'public', table: 'votes' },
       () => loadIssues()
     )
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'action_items' },
+      () => {
+        if (document.getElementById('action-items-tab').classList.contains('active')) {
+          loadActionItems();
+        }
+      }
+    )
     .subscribe();
 }
 
@@ -302,8 +310,8 @@ async function createIssueElement(issue) {
   div.className = 'issue-card';
   div.dataset.issueId = issue.id;
 
-  // Get vote summary
-  const { data: voteSummary } = await supabase.rpc('get_issue_vote_summary', {
+  // Get detailed vote summary with weights
+  const { data: voteSummary } = await supabase.rpc('get_detailed_vote_summary', {
     issue_uuid: issue.id
   });
 
@@ -311,11 +319,15 @@ async function createIssueElement(issue) {
   
   let voteSummaryHtml = '';
   if (voteSummary && voteSummary.length > 0) {
+    const totalVotes = voteSummary[0]?.total_votes || 0;
+    const totalWeighted = voteSummary[0]?.total_weighted || 0;
+    
     const voteCounts = voteSummary.map(v => {
       const directors = v.directors.join(', ');
+      const weightedInfo = v.weighted_votes > v.vote_count ? ` (weighted: ${v.weighted_votes})` : '';
       return `
         <div class="vote-count ${v.vote_type}">
-          <strong>${v.vote_type.toUpperCase()}:</strong> ${v.count}
+          <strong>${v.vote_type.toUpperCase()}:</strong> ${v.vote_count}${weightedInfo}
           ${directors ? `<div class="vote-directors">${directors}</div>` : ''}
         </div>
       `;
@@ -323,7 +335,7 @@ async function createIssueElement(issue) {
     
     voteSummaryHtml = `
       <div class="vote-summary">
-        <div class="vote-summary-title">Votes:</div>
+        <div class="vote-summary-title">Votes: ${totalVotes} total${totalWeighted > totalVotes ? ` (${totalWeighted} weighted)` : ''}</div>
         <div class="vote-counts">${voteCounts}</div>
       </div>
     `;
@@ -344,13 +356,168 @@ async function createIssueElement(issue) {
     ${voteSummaryHtml}
     <div class="issue-actions">
       <button class="btn-primary btn-small vote-btn" data-issue-id="${issue.id}">Cast Vote</button>
+      <button class="btn-secondary btn-small action-item-btn" data-issue-id="${issue.id}">+ Action Item</button>
     </div>
   `;
 
   // Add vote button handler
   div.querySelector('.vote-btn').addEventListener('click', () => openVoteModal(issue));
+  div.querySelector('.action-item-btn').addEventListener('click', () => openActionItemModal(issue.id));
 
   return div;
+}
+
+// Load action items
+async function loadActionItems() {
+  const actionItemsEl = document.getElementById('action-items-list');
+  
+  try {
+    const { data: actionItems, error } = await supabase
+      .from('action_items')
+      .select('*, issues(title)')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    actionItemsEl.innerHTML = '';
+
+    if (actionItems.length === 0) {
+      actionItemsEl.innerHTML = '<div class="loading">No action items yet. Create one to track tasks!</div>';
+      return;
+    }
+
+    actionItems.forEach(item => {
+      const itemEl = createActionItemElement(item);
+      actionItemsEl.appendChild(itemEl);
+    });
+  } catch (error) {
+    console.error('Error loading action items:', error);
+    actionItemsEl.innerHTML = '<div class="error">Error loading action items</div>';
+  }
+}
+
+// Create action item element
+function createActionItemElement(item) {
+  const div = document.createElement('div');
+  div.className = 'action-item-card';
+  div.dataset.actionItemId = item.id;
+
+  const dueDate = item.due_date ? new Date(item.due_date) : null;
+  const isOverdue = dueDate && dueDate < new Date() && item.status !== 'completed' && item.status !== 'cancelled';
+  const dueDateStr = dueDate ? dueDate.toLocaleDateString() : 'No due date';
+  const createdDate = new Date(item.created_at).toLocaleDateString();
+
+  div.innerHTML = `
+    <div class="action-item-header">
+      <div>
+        <div class="action-item-title">${escapeHtml(item.title)}</div>
+        <div class="action-item-meta">
+          <span>Created: ${createdDate}</span>
+          ${item.issues ? `<span>Issue: ${escapeHtml(item.issues.title)}</span>` : ''}
+          ${item.assigned_to ? `<span>Assigned: ${escapeHtml(item.assigned_to)}</span>` : '<span>Unassigned</span>'}
+        </div>
+      </div>
+      <span class="action-item-status ${item.status}">${item.status.replace('_', ' ')}</span>
+    </div>
+    ${item.description ? `<div class="action-item-description">${escapeHtml(item.description)}</div>` : ''}
+    ${item.assigned_to ? `<div class="action-item-assigned"><strong>Assigned to:</strong> ${escapeHtml(item.assigned_to)}</div>` : ''}
+    <div class="action-item-due-date ${isOverdue ? 'overdue' : ''}">
+      ${isOverdue ? '⚠️ ' : ''}Due: ${dueDateStr}
+    </div>
+    <div class="action-item-actions">
+      <select class="action-item-status-select" data-id="${item.id}" data-current="${item.status}">
+        <option value="open" ${item.status === 'open' ? 'selected' : ''}>Open</option>
+        <option value="in_progress" ${item.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+        <option value="completed" ${item.status === 'completed' ? 'selected' : ''}>Completed</option>
+        <option value="cancelled" ${item.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+      </select>
+    </div>
+  `;
+
+  // Add status change handler
+  const select = div.querySelector('.action-item-status-select');
+  select.addEventListener('change', async (e) => {
+    const newStatus = e.target.value;
+    const oldStatus = e.target.dataset.current;
+    
+    if (newStatus === oldStatus) return;
+    
+    if (await updateActionItemStatus(item.id, newStatus)) {
+      e.target.dataset.current = newStatus;
+      await loadActionItems();
+    } else {
+      e.target.value = oldStatus;
+    }
+  });
+
+  return div;
+}
+
+// Create action item
+async function createActionItem(title, description, assignedTo, dueDate, issueId) {
+  if (!currentUser) return;
+
+  const actionItem = {
+    title,
+    description: description || null,
+    assigned_to: assignedTo || null,
+    due_date: dueDate || null,
+    issue_id: issueId || null,
+    created_by: currentUser.email,
+    status: 'open',
+  };
+
+  const { error } = await supabase
+    .from('action_items')
+    .insert(actionItem);
+
+  if (error) {
+    console.error('Error creating action item:', error);
+    alert('Failed to create action item: ' + error.message);
+    return false;
+  }
+
+  return true;
+}
+
+// Update action item status
+async function updateActionItemStatus(actionItemId, newStatus) {
+  const update = {
+    status: newStatus,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (newStatus === 'completed') {
+    update.completed_at = new Date().toISOString();
+  }
+
+  const { error } = await supabase
+    .from('action_items')
+    .update(update)
+    .eq('id', actionItemId);
+
+  if (error) {
+    console.error('Error updating action item:', error);
+    alert('Failed to update action item: ' + error.message);
+    return false;
+  }
+
+  return true;
+}
+
+// Open action item modal
+function openActionItemModal(issueId = null) {
+  const modal = document.getElementById('action-item-modal');
+  const issueIdEl = document.getElementById('action-item-issue-id');
+  
+  issueIdEl.value = issueId || '';
+  modal.style.display = 'flex';
+}
+
+// Close action item modal
+function closeActionItemModal() {
+  document.getElementById('action-item-modal').style.display = 'none';
+  document.getElementById('new-action-item-form').reset();
 }
 
 // Open vote modal
@@ -393,7 +560,7 @@ function closeVoteModal() {
 }
 
 // Submit vote
-async function submitVote(issueId, directorName, voteType, rationale) {
+async function submitVote(issueId, directorName, voteType, rationale, voteWeight = 1, notes = null) {
   const { error } = await supabase
     .from('votes')
     .upsert({
@@ -401,6 +568,8 @@ async function submitVote(issueId, directorName, voteType, rationale) {
       director_name: directorName,
       vote_type: voteType,
       rationale: rationale || null,
+      vote_weight: voteWeight || 1,
+      notes: notes || null,
     }, {
       onConflict: 'issue_id,director_name'
     });
@@ -516,8 +685,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const directorName = document.getElementById('vote-director').value;
     const voteType = document.querySelector('input[name="vote-type"]:checked').value;
     const rationale = document.getElementById('vote-rationale').value;
+    const voteWeight = parseInt(document.getElementById('vote-weight').value) || 1;
+    const notes = document.getElementById('vote-notes').value;
     
-    if (await submitVote(issueId, directorName, voteType, rationale)) {
+    if (await submitVote(issueId, directorName, voteType, rationale, voteWeight, notes)) {
       closeVoteModal();
     }
   });
@@ -539,5 +710,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('close-guidelines').addEventListener('click', () => {
     document.getElementById('guidelines-panel').style.display = 'none';
+  });
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.dataset.tab;
+      
+      // Update button states
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update content visibility
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        content.style.display = 'none';
+      });
+      
+      const targetTab = document.getElementById(`${tabName}-tab`);
+      if (targetTab) {
+        targetTab.classList.add('active');
+        targetTab.style.display = 'block';
+      }
+      
+      // Load data if needed
+      if (tabName === 'action-items') {
+        loadActionItems();
+      }
+    });
+  });
+
+  // Action item form
+  document.getElementById('new-action-item-btn').addEventListener('click', () => openActionItemModal());
+  document.getElementById('new-action-item-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('action-item-title').value;
+    const description = document.getElementById('action-item-description').value;
+    const assignedTo = document.getElementById('action-item-assigned').value;
+    const dueDate = document.getElementById('action-item-due-date').value;
+    const issueId = document.getElementById('action-item-issue-id').value || null;
+    
+    if (await createActionItem(title, description, assignedTo, dueDate, issueId)) {
+      closeActionItemModal();
+      await loadActionItems();
+    }
+  });
+  document.getElementById('close-action-item-modal').addEventListener('click', closeActionItemModal);
+  document.getElementById('cancel-action-item').addEventListener('click', closeActionItemModal);
+
+  // Close action item modal on outside click
+  document.getElementById('action-item-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'action-item-modal') closeActionItemModal();
   });
 });

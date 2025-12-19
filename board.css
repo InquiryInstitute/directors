@@ -627,6 +627,149 @@
   border-color: var(--secondary-color);
 }
 
+/* Tabs */
+.section-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #666;
+  transition: all 0.3s ease;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: var(--primary-color);
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--secondary-color);
+  font-weight: 600;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Action Items */
+.action-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.action-item-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.action-item-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.action-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.action-item-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.action-item-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #999;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-item-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.action-item-status.open {
+  background: #d4edda;
+  color: #155724;
+}
+
+.action-item-status.in_progress {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.action-item-status.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.action-item-status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.action-item-description {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.action-item-assigned {
+  font-size: 0.9rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.action-item-assigned strong {
+  color: var(--primary-color);
+}
+
+.action-item-due-date {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.action-item-due-date.overdue {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.action-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 968px) {
   .board-layout {
