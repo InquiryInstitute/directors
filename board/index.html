@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board Chat - Inquiry Institute</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../board.css">
+  <meta name="description" content="Board of Directors chat and voting system for the Inquiry Institute.">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Inquiry Institute</h1>
+      <h2>Board of Directors - Proceedings</h2>
+      <div class="auth-status" id="auth-status">
+        <span id="user-email"></span>
+        <button id="logout-btn" class="btn-secondary" style="display: none;">Logout</button>
+        <button id="login-btn" class="btn-primary">Login</button>
+        <a href="members.html" class="btn-secondary" id="members-link" style="display: none; text-decoration: none; padding: 0.5rem 1rem;">Members</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container board-main">
+    <!-- Login Form (shown when not authenticated) -->
+    <div id="login-container" class="login-container" style="display: none;">
+      <div class="login-card">
+        <h2>Board Access</h2>
+        <p>Please authenticate to access the board proceedings.</p>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="custodian@inquiry.institute">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <div id="login-error" class="error-message" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Board Interface (shown when authenticated) -->
+    <div id="board-interface" class="board-interface" style="display: none;">
+      <div class="board-layout">
+        <!-- Chat Section -->
+        <section class="chat-section">
+          <div class="section-header">
+            <h3>Board Proceedings</h3>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <button id="toggle-guidelines" class="btn-secondary btn-small">📜 Guidelines</button>
+              <span class="badge" id="message-count">0 messages</span>
+            </div>
+          </div>
+
+          <!-- Director Guidelines Panel -->
+          <div id="guidelines-panel" class="guidelines-panel" style="display: none;">
+            <div class="guidelines-content">
+              <h4>Director Principles & Guidelines</h4>
+              <div class="guidelines-list">
+                <div class="guideline-item">
+                  <strong>1. Institute First</strong>
+                  <p>Directors must prioritize what is best for the Inquiry Institute as a whole above all other considerations.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>2. College Representation</strong>
+                  <p>After the Institute, directors represent their college's interests and views. Directors can convene faculty meetings to elucidate college positions on matters before the board.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>3. Appointment & Platform</strong>
+                  <p>Directors are appointed by their college and should adhere to their platform statement, which guides their decision-making and representation.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>4. Decision Hierarchy</strong>
+                  <p>When making decisions, consider in order: (1) Institute's best interest, (2) College's best interest, (3) College's views and positions, (4) Personal platform statement.</p>
+                </div>
+              </div>
+              <button class="btn-secondary btn-small" id="close-guidelines">Close</button>
+            </div>
+          </div>
+          
+          <div class="chat-messages" id="chat-messages">
+            <div class="loading">Loading messages...</div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="record-toggle-container">
+              <label class="record-toggle">
+                <input type="checkbox" id="off-the-record-toggle">
+                <span class="toggle-slider"></span>
+                <span class="toggle-label" id="toggle-label">On the Record</span>
+              </label>
+            </div>
+            <form id="chat-form" class="chat-form">
+              <input 
+                type="text" 
+                id="message-input" 
+                placeholder="Type your message..." 
+                required
+                autocomplete="off"
+              >
+              <button type="submit" class="btn-primary">Send</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Issues & Voting Section -->
+        <section class="voting-section">
+          <div class="section-header">
+            <h3>Issues & Voting</h3>
+            <button id="new-issue-btn" class="btn-primary btn-small">+ New Issue</button>
+          </div>
+
+          <div class="issues-list" id="issues-list">
+            <div class="loading">Loading issues...</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- New Issue Modal -->
+  <div id="issue-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Create New Issue</h3>
+        <button class="modal-close" id="close-issue-modal">&times;</button>
+      </div>
+      <form id="new-issue-form">
+        <div class="form-group">
+          <label for="issue-title">Title</label>
+          <input type="text" id="issue-title" name="title" required placeholder="Issue title">
+        </div>
+        <div class="form-group">
+          <label for="issue-description">Description</label>
+          <textarea id="issue-description" name="description" rows="4" placeholder="Issue description"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancel-issue">Cancel</button>
+          <button type="submit" class="btn-primary">Create Issue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Vote Modal -->
+  <div id="vote-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Cast Vote</h3>
+        <button class="modal-close" id="close-vote-modal">&times;</button>
+      </div>
+      <div id="vote-issue-details"></div>
+      <form id="vote-form">
+        <input type="hidden" id="vote-issue-id">
+        <div class="form-group">
+          <label>Select Director</label>
+          <select id="vote-director" name="director" required>
+            <option value="">Select a director...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Vote</label>
+          <div class="vote-options">
+            <label class="vote-option">
+              <input type="radio" name="vote-type" value="yes" required>
+              <span>Yes</span>
+            </label>
+            <label class="vote-option">
+              <input type="radio" name="vote-type" value="no" required>
+              <span>No</span>
+            </label>
+            <label class="vote-option">
+              <input type="radio" name="vote-type" value="abstain" required>
+              <span>Abstain</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="vote-rationale">Rationale (optional)</label>
+          <textarea id="vote-rationale" name="rationale" rows="3" placeholder="Explain your vote..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancel-vote">Cancel</button>
+          <button type="submit" class="btn-primary">Submit Vote</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Inquiry Institute. All rights reserved.</p>
+      <p><a href="index.html">View Board of Directors</a></p>
+    </div>
+  </footer>
+
+  <script src="../config.js"></script>
+  <script type="module" src="../board.js"></script>
+</body>
+</html>
