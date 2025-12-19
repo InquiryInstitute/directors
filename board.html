@@ -50,7 +50,36 @@
         <section class="chat-section">
           <div class="section-header">
             <h3>Board Proceedings</h3>
-            <span class="badge" id="message-count">0 messages</span>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+              <button id="toggle-guidelines" class="btn-secondary btn-small">📜 Guidelines</button>
+              <span class="badge" id="message-count">0 messages</span>
+            </div>
+          </div>
+
+          <!-- Director Guidelines Panel -->
+          <div id="guidelines-panel" class="guidelines-panel" style="display: none;">
+            <div class="guidelines-content">
+              <h4>Director Principles & Guidelines</h4>
+              <div class="guidelines-list">
+                <div class="guideline-item">
+                  <strong>1. Institute First</strong>
+                  <p>Directors must prioritize what is best for the Inquiry Institute as a whole above all other considerations.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>2. College Representation</strong>
+                  <p>After the Institute, directors represent their college's interests and views. Directors can convene faculty meetings to elucidate college positions on matters before the board.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>3. Appointment & Platform</strong>
+                  <p>Directors are appointed by their college and should adhere to their platform statement, which guides their decision-making and representation.</p>
+                </div>
+                <div class="guideline-item">
+                  <strong>4. Decision Hierarchy</strong>
+                  <p>When making decisions, consider in order: (1) Institute's best interest, (2) College's best interest, (3) College's views and positions, (4) Personal platform statement.</p>
+                </div>
+              </div>
+              <button class="btn-secondary btn-small" id="close-guidelines">Close</button>
+            </div>
           </div>
           
           <div class="chat-messages" id="chat-messages">

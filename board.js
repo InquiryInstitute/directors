@@ -131,10 +131,16 @@ async function loadChatMessages() {
     if (error) throw error;
 
     messagesEl.innerHTML = '';
+    
+    // Add system message with director principles
+    const systemMessage = createSystemMessage();
+    messagesEl.appendChild(systemMessage);
+    
     document.getElementById('message-count').textContent = `${messages.length} messages`;
 
     if (messages.length === 0) {
-      messagesEl.innerHTML = '<div class="loading">No messages yet. Start the conversation!</div>';
+      messagesEl.innerHTML += '<div class="loading">No messages yet. Start the conversation!</div>';
+      messagesEl.scrollTop = messagesEl.scrollHeight;
       return;
     }
 
@@ -149,6 +155,31 @@ async function loadChatMessages() {
     console.error('Error loading messages:', error);
     messagesEl.innerHTML = '<div class="error">Error loading messages</div>';
   }
+}
+
+// Create system message with director principles
+function createSystemMessage() {
+  const div = document.createElement('div');
+  div.className = 'chat-message system-message';
+  
+  div.innerHTML = `
+    <div class="chat-message-header">
+      <span class="chat-message-author">📜 System</span>
+      <span class="chat-message-time">Director Principles</span>
+    </div>
+    <div class="chat-message-text">
+      <strong>Director Principles for Board Proceedings:</strong>
+      <ol style="margin: 0.5rem 0; padding-left: 1.5rem;">
+        <li><strong>Institute First:</strong> Prioritize what is best for the Inquiry Institute as a whole.</li>
+        <li><strong>College Representation:</strong> Represent your college's interests and views. Convene faculty meetings to elucidate college positions when needed.</li>
+        <li><strong>Platform Adherence:</strong> Adhere to your platform statement, which guides your decision-making and representation.</li>
+        <li><strong>Decision Hierarchy:</strong> Consider in order: (1) Institute's best interest, (2) College's best interest, (3) College's views, (4) Personal platform.</li>
+      </ol>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;">These principles guide all board discussions and decisions.</p>
+    </div>
+  `;
+  
+  return div;
 }
 
 // Create message element
@@ -499,5 +530,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('vote-modal').addEventListener('click', (e) => {
     if (e.target.id === 'vote-modal') closeVoteModal();
+  });
+
+  // Guidelines toggle
+  document.getElementById('toggle-guidelines').addEventListener('click', () => {
+    const panel = document.getElementById('guidelines-panel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('close-guidelines').addEventListener('click', () => {
+    document.getElementById('guidelines-panel').style.display = 'none';
   });
 });

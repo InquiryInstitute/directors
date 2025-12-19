@@ -168,6 +168,11 @@ Access the board chat at `/board.html`. Features:
 
 - **Authentication**: Members must log in to access
 - **Real-time Chat**: Live board proceedings with all members
+- **Director Principles**: System message and guidelines panel outlining director responsibilities:
+  - **Institute First**: Prioritize what's best for the Inquiry Institute
+  - **College Representation**: Represent college interests and views (can convene faculty meetings)
+  - **Platform Adherence**: Adhere to platform statements that guide decision-making
+  - **Decision Hierarchy**: Institute → College → College Views → Personal Platform
 - **On/Off the Record Toggle**: Toggle button to mark messages as off the record (not formally recorded)
 - **Issue Tracking**: Create and track issues for board discussion
 - **Voting System**: Directors can vote on issues (Yes/No/Abstain)
