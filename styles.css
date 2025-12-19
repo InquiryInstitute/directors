@@ -147,13 +147,43 @@ main {
   line-height: 1.3;
 }
 
+.director-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.director-section:first-of-type {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
 .rationale {
   color: #666;
   font-size: 0.95rem;
   line-height: 1.6;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+}
+
+.platform-statement {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-style: italic;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--secondary-color);
+  margin-top: 0.5rem;
 }
 
 .heretic-card {

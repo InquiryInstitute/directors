@@ -39,7 +39,7 @@ async function loadBoardMembers() {
 
     if (collegesError) throw collegesError;
 
-    // Fetch board of directors
+    // Fetch board of directors with platform statements
     const { data: directors, error: directorsError } = await supabaseClient
       .from('board_of_directors')
       .select('*, colleges(*)')
@@ -86,11 +86,25 @@ function createDirectorCard(director, college) {
   const card = document.createElement('div');
   card.className = 'board-card';
 
+  const interests = director.rationale || college?.description || 'No interests specified';
+  const platform = director.platform_statement || null;
+
   card.innerHTML = `
     <div class="college-code">${college?.code || 'N/A'}</div>
     <div class="college-name">${college?.name || 'Unknown College'}</div>
     <div class="director-name">${director.director_name || 'Vacant'}</div>
-    ${director.rationale ? `<div class="rationale">${director.rationale}</div>` : ''}
+    
+    <div class="director-section">
+      <div class="section-label">Interests</div>
+      <div class="rationale">${escapeHtml(interests)}</div>
+    </div>
+    
+    ${platform ? `
+    <div class="director-section">
+      <div class="section-label">Platform</div>
+      <div class="platform-statement">${escapeHtml(platform)}</div>
+    </div>
+    ` : ''}
   `;
 
   return card;
@@ -100,14 +114,35 @@ function createHereticCard(heretic) {
   const card = document.createElement('div');
   card.className = 'board-card heretic-card';
 
+  const interests = heretic.rationale || 'No interests specified';
+  const platform = heretic.platform_statement || null;
+
   card.innerHTML = `
     <div class="college-code">HERETIC</div>
     <div class="college-name">Heretic Position</div>
     <div class="director-name">${heretic.director_name || 'Vacant'}</div>
-    ${heretic.rationale ? `<div class="rationale">${heretic.rationale}</div>` : ''}
+    
+    <div class="director-section">
+      <div class="section-label">Interests</div>
+      <div class="rationale">${escapeHtml(interests)}</div>
+    </div>
+    
+    ${platform ? `
+    <div class="director-section">
+      <div class="section-label">Platform</div>
+      <div class="platform-statement">${escapeHtml(platform)}</div>
+    </div>
+    ` : ''}
   `;
 
   return card;
+}
+
+// Utility: Escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Load board members when page loads
