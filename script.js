@@ -132,7 +132,23 @@ function createDirectorCard(director, college) {
       <div class="platform-statement">${escapeHtml(platform)}</div>
     </div>
     ` : ''}
+    
+    ${director.excitement_statement ? `
+    <div class="director-section">
+      <div class="section-label">Why I'm Excited</div>
+      <div class="excitement-statement">${escapeHtml(director.excitement_statement)}</div>
+      <button class="play-statement-btn" data-director-id="${director.id}" data-statement="${escapeHtml(director.excitement_statement)}" title="Play statement">
+        🔊 Play
+      </button>
+    </div>
+    ` : ''}
   `;
+
+  // Add event listener for play button if it exists
+  const playBtn = card.querySelector('.play-statement-btn');
+  if (playBtn) {
+    playBtn.addEventListener('click', () => playStatement(playBtn.dataset.directorId, playBtn.dataset.statement));
+  }
 
   return card;
 }
@@ -179,9 +195,78 @@ function createHereticCard(heretic) {
       <div class="platform-statement">${escapeHtml(platform)}</div>
     </div>
     ` : ''}
+    
+    ${heretic.excitement_statement ? `
+    <div class="director-section">
+      <div class="section-label">Why I'm Excited</div>
+      <div class="excitement-statement">${escapeHtml(heretic.excitement_statement)}</div>
+      <button class="play-statement-btn" data-director-id="${heretic.id}" data-statement="${escapeHtml(heretic.excitement_statement)}" title="Play statement">
+        🔊 Play
+      </button>
+    </div>
+    ` : ''}
   `;
 
+  // Add event listener for play button if it exists
+  const playBtn = card.querySelector('.play-statement-btn');
+  if (playBtn) {
+    playBtn.addEventListener('click', () => playStatement(playBtn.dataset.directorId, playBtn.dataset.statement));
+  }
+
   return card;
+}
+
+// Play statement using Supabase TTS edge function
+async function playStatement(directorId, statement) {
+  const button = document.querySelector(`[data-director-id="${directorId}"]`);
+  if (!button || !statement) return;
+
+  // Disable button during playback
+  button.disabled = true;
+  button.textContent = '⏳ Generating...';
+
+  try {
+    // Call Supabase edge function for TTS
+    const { data, error } = await supabaseClient.functions.invoke('tts', {
+      body: {
+        text: statement,
+        voice: 'default', // You can customize this
+      }
+    });
+
+    if (error) throw error;
+
+    // Create audio element and play
+    const audioUrl = data.audio_url || data.url;
+    if (!audioUrl) {
+      throw new Error('No audio URL returned from TTS function');
+    }
+
+    const audio = new Audio(audioUrl);
+    
+    audio.onplay = () => {
+      button.textContent = '⏸️ Playing...';
+    };
+    
+    audio.onended = () => {
+      button.disabled = false;
+      button.textContent = '🔊 Play';
+    };
+    
+    audio.onerror = (e) => {
+      console.error('Audio playback error:', e);
+      button.disabled = false;
+      button.textContent = '🔊 Play';
+      alert('Error playing audio. Please try again.');
+    };
+
+    await audio.play();
+  } catch (error) {
+    console.error('Error playing statement:', error);
+    button.disabled = false;
+    button.textContent = '🔊 Play';
+    alert('Error: ' + (error.message || 'Failed to play statement'));
+  }
 }
 
 // Utility: Get initials from name
@@ -192,6 +277,59 @@ function getInitials(name) {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
   return name.substring(0, 2).toUpperCase();
+}
+
+// Play statement using Supabase TTS edge function
+async function playStatement(directorId, statement) {
+  const button = document.querySelector(`[data-director-id="${directorId}"]`);
+  if (!button || !statement) return;
+
+  // Disable button during playback
+  button.disabled = true;
+  button.textContent = '⏳ Generating...';
+
+  try {
+    // Call Supabase edge function for TTS
+    const { data, error } = await supabaseClient.functions.invoke('tts', {
+      body: {
+        text: statement,
+        voice: 'default', // You can customize this
+      }
+    });
+
+    if (error) throw error;
+
+    // Create audio element and play
+    const audioUrl = data.audio_url || data.url;
+    if (!audioUrl) {
+      throw new Error('No audio URL returned from TTS function');
+    }
+
+    const audio = new Audio(audioUrl);
+    
+    audio.onplay = () => {
+      button.textContent = '⏸️ Playing...';
+    };
+    
+    audio.onended = () => {
+      button.disabled = false;
+      button.textContent = '🔊 Play';
+    };
+    
+    audio.onerror = (e) => {
+      console.error('Audio playback error:', e);
+      button.disabled = false;
+      button.textContent = '🔊 Play';
+      alert('Error playing audio. Please try again.');
+    };
+
+    await audio.play();
+  } catch (error) {
+    console.error('Error playing statement:', error);
+    button.disabled = false;
+    button.textContent = '🔊 Play';
+    alert('Error: ' + (error.message || 'Failed to play statement'));
+  }
 }
 
 // Utility: Escape HTML

@@ -234,6 +234,43 @@ main {
   margin-top: 0.5rem;
 }
 
+.excitement-statement {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  background: #e8f5e9;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #4caf50;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.play-statement-btn {
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.play-statement-btn:hover:not(:disabled) {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.play-statement-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .heretic-card {
   grid-column: 1 / -1;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
