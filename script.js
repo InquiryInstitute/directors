@@ -39,11 +39,19 @@ async function loadBoardMembers() {
 
     if (collegesError) throw collegesError;
 
-    // Fetch board of directors with platform statements
+    // Fetch board of directors with platform statements and portraits
     const { data: directors, error: directorsError } = await supabaseClient
       .from('board_of_directors')
       .select('*, colleges(*)')
       .order('position_type');
+    
+    // Log for debugging
+    if (directors) {
+      console.log('Directors loaded:', directors.length);
+      directors.forEach(d => {
+        console.log(`${d.director_name}: portrait_url = ${d.portrait_url || 'null'}`);
+      });
+    }
 
     if (directorsError) throw directorsError;
 
