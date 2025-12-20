@@ -1,13 +1,84 @@
+/* Import Google Fonts to match Inquiry.Institute */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=Cinzel+Decorative:wght@400;700&display=swap');
+
 :root {
-  --primary-color: #2c3e50;
-  --secondary-color: #3498db;
-  --accent-color: #e74c3c;
-  --text-color: #333;
-  --bg-color: #f8f9fa;
-  --card-bg: #ffffff;
-  --border-color: #e0e0e0;
+  /* Inquiry.Institute color scheme */
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --primary: #171717;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #171717;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #171717;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #171717;
+  --radius: 0.5rem;
+  
+  /* Slate colors (matching Tailwind) */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  
+  /* Amber colors */
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  
+  /* Legacy support */
+  --primary-color: var(--slate-900);
+  --secondary-color: var(--amber-500);
+  --accent-color: var(--amber-600);
+  --text-color: var(--foreground);
+  --bg-color: var(--background);
+  --card-bg: var(--card);
+  --border-color: var(--border);
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --card: #0a0a0a;
+    --card-foreground: #ededed;
+    --primary: #ededed;
+    --primary-foreground: #0a0a0a;
+    --secondary: #27272a;
+    --secondary-foreground: #ededed;
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+    --accent: #27272a;
+    --accent-foreground: #ededed;
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #ededed;
+    
+    --slate-200: #1e293b;
+    --slate-300: #334155;
+    --slate-700: #cbd5e1;
+    --slate-800: #e2e8f0;
+    --slate-900: #f1f5f9;
+    
+    --primary-color: var(--slate-900);
+    --text-color: var(--foreground);
+    --bg-color: var(--background);
+    --card-bg: var(--card);
+    --border-color: var(--border);
+  }
 }
 
 * {
@@ -17,13 +88,18 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'EB Garamond', serif;
   line-height: 1.6;
-  color: var(--text-color);
-  background-color: var(--bg-color);
+  color: var(--foreground);
+  background-color: var(--background);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Decorative font for headings */
+.font-decorative {
+  font-family: 'Cinzel Decorative', serif;
 }
 
 .container {
@@ -35,11 +111,11 @@ body {
 
 /* Page header (below navigation) */
 .page-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-  color: white;
+  background: var(--background);
+  color: var(--foreground);
   padding: 3rem 0;
   text-align: center;
-  box-shadow: var(--shadow);
+  border-bottom: 1px solid var(--border);
   margin-top: 64px; /* Account for sticky header */
 }
 
@@ -47,12 +123,26 @@ body {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  font-family: 'Cinzel Decorative', serif;
+  color: var(--slate-900);
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-header h1 {
+    color: var(--slate-100);
+  }
 }
 
 .page-header h2 {
   font-size: 1.5rem;
-  font-weight: 300;
-  opacity: 0.9;
+  font-weight: 400;
+  color: var(--slate-600);
+}
+
+@media (prefers-color-scheme: dark) {
+  .page-header h2 {
+    color: var(--slate-400);
+  }
 }
 
 /* Legacy header support */
@@ -114,12 +204,12 @@ main {
 }
 
 .board-card {
-  background: var(--card-bg);
+  background: var(--card);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: var(--shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
 }
@@ -193,7 +283,7 @@ main {
 
 .college-code {
   display: inline-block;
-  background: var(--primary-color);
+  background: var(--slate-900);
   color: white;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
@@ -203,19 +293,32 @@ main {
   margin-bottom: 0.5rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .college-code {
+    background: var(--slate-700);
+  }
+}
+
 .college-name {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--slate-900);
   margin-bottom: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .college-name {
+    color: var(--slate-100);
+  }
 }
 
 .director-name {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--text-color);
+  color: var(--foreground);
   margin: 0;
   line-height: 1.3;
+  font-family: 'Cinzel Decorative', serif;
 }
 
 .director-section {
@@ -234,31 +337,43 @@ main {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--primary-color);
+  color: var(--slate-600);
   margin-bottom: 0.5rem;
   opacity: 0.8;
 }
 
+@media (prefers-color-scheme: dark) {
+  .section-label {
+    color: var(--slate-400);
+  }
+}
+
 .rationale {
-  color: #666;
+  color: var(--muted-foreground);
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .platform-statement {
-  color: var(--text-color);
+  color: var(--foreground);
   font-size: 0.95rem;
   line-height: 1.7;
   font-style: italic;
-  background: #f8f9fa;
+  background: var(--slate-50);
   padding: 1rem;
   border-radius: 6px;
-  border-left: 3px solid var(--secondary-color);
+  border-left: 3px solid var(--amber-500);
   margin-top: 0.5rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .platform-statement {
+    background: var(--slate-800);
+  }
+}
+
 .excitement-statement {
-  color: var(--text-color);
+  color: var(--foreground);
   font-size: 0.95rem;
   line-height: 1.7;
   background: #e8f5e9;
@@ -269,8 +384,14 @@ main {
   margin-bottom: 0.75rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  .excitement-statement {
+    background: rgba(76, 175, 80, 0.1);
+  }
+}
+
 .play-statement-btn {
-  background: var(--secondary-color);
+  background: var(--amber-500);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -285,7 +406,7 @@ main {
 }
 
 .play-statement-btn:hover:not(:disabled) {
-  background: #2980b9;
+  background: var(--amber-600);
   transform: translateY(-1px);
 }
 
@@ -296,20 +417,33 @@ main {
 
 .heretic-card {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 2px dashed var(--accent-color);
+  background: var(--slate-50);
+  border: 2px dashed var(--amber-500);
+}
+
+@media (prefers-color-scheme: dark) {
+  .heretic-card {
+    background: var(--slate-800);
+  }
 }
 
 .heretic-card .college-code {
-  background: var(--accent-color);
+  background: var(--amber-500);
 }
 
 footer {
-  background: var(--primary-color);
+  background: var(--slate-900);
   color: white;
   text-align: center;
   padding: 2rem 0;
   margin-top: 3rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+  footer {
+    background: var(--slate-950);
+  }
 }
 
 footer p {
