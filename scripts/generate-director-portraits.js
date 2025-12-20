@@ -11,7 +11,7 @@
  * - Supabase credentials in .env
  */
 
-import { Replicate } from 'replicate';
+import Replicate from 'replicate';
 import { Storage } from '@google-cloud/storage';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
@@ -164,7 +164,7 @@ async function main() {
   
   console.log(`✅ Found Replicate API token: ${process.env.REPLICATE_API_TOKEN.substring(0, 10)}...`);
   
-  const replicate = new Replicate({
+  const replicate = new Replicate.default({
     auth: process.env.REPLICATE_API_TOKEN,
   });
   
