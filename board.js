@@ -18,11 +18,20 @@ async function initSupabase() {
 
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   
+  // Load board content for public viewing
+  await loadChatMessages();
+  await loadIssues();
+  setupSubscriptions();
+  
   // Check for existing session
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
     currentUser = session.user;
     await handleAuthSuccess();
+  } else {
+    // Show board interface even when not logged in (public viewing)
+    document.getElementById('board-interface').style.display = 'block';
+    document.getElementById('chat-form').style.display = 'none'; // Hide input for non-authenticated
   }
 
   // Listen for auth changes
@@ -58,6 +67,9 @@ async function handleAuthSuccess() {
   document.getElementById('login-container').style.display = 'none';
   document.getElementById('board-interface').style.display = 'block';
   
+  // Show chat form for authenticated users
+  document.getElementById('chat-form').style.display = 'flex';
+  
   const userEmailEl = document.getElementById('user-email');
   if (member) {
     userEmailEl.textContent = `${member.name || member.email} (${member.member_class})`;
@@ -72,19 +84,43 @@ async function handleAuthSuccess() {
   if (member && member.member_class === 'custodian') {
     document.getElementById('members-link').style.display = 'inline-block';
   }
+  
+  // Show off-the-record toggle only for alpha members
+  const offRecordToggleContainer = document.getElementById('off-record-toggle-container');
+  if (member && member.member_class === 'alpha') {
+    if (offRecordToggleContainer) offRecordToggleContainer.style.display = 'flex';
+  } else {
+    if (offRecordToggleContainer) offRecordToggleContainer.style.display = 'none';
+  }
+  
+  // Show off-the-record toggle only for alpha members
+  const offRecordToggleContainer = document.getElementById('off-record-toggle-container');
+  if (member && member.member_class === 'alpha') {
+    offRecordToggleContainer.style.display = 'flex';
+  } else {
+    offRecordToggleContainer.style.display = 'none';
+  }
 
   await loadChatMessages();
   await loadIssues();
   setupSubscriptions();
 }
 
-// Handle authentication failure
+// Handle authentication failure (but still allow public viewing)
 function handleAuthFailure() {
   document.getElementById('login-container').style.display = 'block';
-  document.getElementById('board-interface').style.display = 'none';
+  document.getElementById('board-interface').style.display = 'block'; // Show board even when not logged in
   document.getElementById('user-email').textContent = '';
   document.getElementById('login-btn').style.display = 'inline-block';
   document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('members-link').style.display = 'none';
+  document.getElementById('off-record-toggle-container').style.display = 'none';
+  
+  // Hide chat input for non-authenticated users
+  const chatForm = document.getElementById('chat-form');
+  if (chatForm) {
+    chatForm.style.display = currentUser ? 'flex' : 'none';
+  }
 
   if (chatSubscription) {
     supabase.removeChannel(chatSubscription);
@@ -209,14 +245,23 @@ function createMessageElement(message) {
 
 // Send message
 async function sendMessage(messageText, offTheRecord = false) {
-  if (!currentUser) return;
+  if (!currentUser) {
+    alert('Please log in to send messages');
+    return;
+  }
 
   // Get member info
   const { data: member } = await supabase
     .from('members')
-    .select('id, name')
+    .select('id, name, member_class')
     .eq('email', currentUser.email)
     .single();
+
+  // Only alpha members can post off-the-record
+  if (offTheRecord && (!member || member.member_class !== 'alpha')) {
+    alert('Only alpha members can post off-the-record messages');
+    return;
+  }
 
   const { error } = await supabase
     .from('chat_messages')
@@ -225,7 +270,7 @@ async function sendMessage(messageText, offTheRecord = false) {
       user_name: member?.name || currentUser.user_metadata?.name || currentUser.email.split('@')[0],
       message: messageText,
       member_id: member?.id || null,
-      off_the_record: offTheRecord,
+      off_the_record: offTheRecord && member?.member_class === 'alpha', // Ensure only alpha can post off-record
     });
 
   if (error) {
