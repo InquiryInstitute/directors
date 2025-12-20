@@ -279,59 +279,6 @@ function getInitials(name) {
   return name.substring(0, 2).toUpperCase();
 }
 
-// Play statement using Supabase TTS edge function
-async function playStatement(directorId, statement) {
-  const button = document.querySelector(`[data-director-id="${directorId}"]`);
-  if (!button || !statement) return;
-
-  // Disable button during playback
-  button.disabled = true;
-  button.textContent = '⏳ Generating...';
-
-  try {
-    // Call Supabase edge function for TTS
-    const { data, error } = await supabaseClient.functions.invoke('tts', {
-      body: {
-        text: statement,
-        voice: 'default', // You can customize this
-      }
-    });
-
-    if (error) throw error;
-
-    // Create audio element and play
-    const audioUrl = data.audio_url || data.url;
-    if (!audioUrl) {
-      throw new Error('No audio URL returned from TTS function');
-    }
-
-    const audio = new Audio(audioUrl);
-    
-    audio.onplay = () => {
-      button.textContent = '⏸️ Playing...';
-    };
-    
-    audio.onended = () => {
-      button.disabled = false;
-      button.textContent = '🔊 Play';
-    };
-    
-    audio.onerror = (e) => {
-      console.error('Audio playback error:', e);
-      button.disabled = false;
-      button.textContent = '🔊 Play';
-      alert('Error playing audio. Please try again.');
-    };
-
-    await audio.play();
-  } catch (error) {
-    console.error('Error playing statement:', error);
-    button.disabled = false;
-    button.textContent = '🔊 Play';
-    alert('Error: ' + (error.message || 'Failed to play statement'));
-  }
-}
-
 // Utility: Escape HTML
 function escapeHtml(text) {
   const div = document.createElement('div');
