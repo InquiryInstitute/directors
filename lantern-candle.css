@@ -1,0 +1,95 @@
+/* Lantern and Candle styles */
+.patronage-lantern {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.lantern-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.lantern-button:hover {
+  background: #d97706;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.lantern-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.feedback-candle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.candle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #6366f1;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.candle-button:hover {
+  background: #4f46e5;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.candle-icon {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 768px) {
+  .patronage-lantern,
+  .feedback-candle {
+    bottom: 16px;
+  }
+  
+  .patronage-lantern {
+    left: 16px;
+  }
+  
+  .feedback-candle {
+    right: 16px;
+  }
+  
+  .lantern-button,
+  .candle-button {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .lantern-icon,
+  .candle-icon {
+    width: 20px;
+    height: 20px;
+  }
+}

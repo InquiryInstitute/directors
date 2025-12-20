@@ -33,6 +33,29 @@ body {
   width: 100%;
 }
 
+/* Page header (below navigation) */
+.page-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  padding: 3rem 0;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-top: 64px; /* Account for sticky header */
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+/* Legacy header support */
 header {
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
@@ -294,10 +317,17 @@ footer p {
 }
 
 @media (max-width: 768px) {
+  .page-header {
+    margin-top: 56px;
+    padding: 2rem 0;
+  }
+  
+  .page-header h1,
   header h1 {
     font-size: 2rem;
   }
 
+  .page-header h2,
   header h2 {
     font-size: 1.2rem;
   }
